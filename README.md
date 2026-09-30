@@ -1,6 +1,6 @@
 # Nylon Mac App
 
-A menu bar app that lists the nodes in your [nylon](https://github.com/encodeous/nylon) network with their IPs, and, for each peer, its latency in ms (the best metric `nylon status` shows), "connected" when it's online without a measured latency (like a phone), or "offline". Click a node to copy its IP.
+A menu bar app that lists the nodes in your [nylon](https://github.com/encodeous/nylon) network.
 
 ## Run it
 

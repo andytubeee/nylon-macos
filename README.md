@@ -1,6 +1,6 @@
 # Nylon Mac App
 
-A menu bar app that lists the nodes in your [nylon](https://github.com/encodeous/nylon) network with their IPs, and each peer's best metric (the same number `nylon status` shows). Click a node to copy its IP.
+A menu bar app that lists the nodes in your [nylon](https://github.com/encodeous/nylon) network with their IPs, and, for each peer, its latency in ms (the best metric `nylon status` shows), "connected" when it's online without a measured latency (like a phone), or "offline". Click a node to copy its IP.
 
 ## Run it
 
@@ -13,7 +13,7 @@ A menu bar app that lists the nodes in your [nylon](https://github.com/encodeous
 
 3. Click the network icon in the menu bar, then "Choose central.yaml…" and pick your file. The app remembers it for next time.
 
-4. For metrics, turn on nylon's metrics endpoint. Add this to `node.yaml` and restart nylon:
+4. For latency, turn on nylon's metrics endpoint. Add this to `node.yaml` and restart nylon:
 
    ```yaml
    observability_addr: 127.0.0.1:9090

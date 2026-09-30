@@ -5,9 +5,9 @@ struct MenuContent: View {
     @ObservedObject var store: NodeStore
 
     var body: some View {
-        Text(store.metrics == nil ? "Not running, or observability_addr isn't set" : "Running")
+        Text(store.peers == nil ? "Not running, or observability_addr isn't set" : "Running")
         if let nodes = store.nodes {
-            ForEach(nodes, id: \.name) { NodeRow(node: $0, metric: store.metrics?[$0.name]) }
+            ForEach(nodes, id: \.name) { NodeRow(node: $0, peer: store.peers?[$0.name]) }
         } else {
             Text("Can't read \(store.path)")
         }
@@ -25,10 +25,10 @@ struct MenuContent: View {
     }
 }
 
-// A node's name, IP and, for a peer, its best metric. Clicking it copies the IP.
+// A node's name, IP and, for a peer, its latency or whether it's connected. Clicking it copies the IP.
 struct NodeRow: View {
     let node: Node
-    let metric: UInt32?
+    let peer: Peer? // nil when the node isn't a peer of this one, e.g. this device itself
 
     var body: some View {
         Button(label) {
@@ -40,7 +40,7 @@ struct NodeRow: View {
 
     private var label: String {
         var label = "\(node.name)  \(node.address ?? "no address")"
-        if let metric { label += "  metric \(metric >= INFM ? "INF" : String(metric))" }
+        if let peer { label += "  \(statusText(peer))" }
         return label
     }
 }

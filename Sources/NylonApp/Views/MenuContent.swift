@@ -5,8 +5,9 @@ struct MenuContent: View {
     @ObservedObject var store: NodeStore
 
     var body: some View {
+        Text(store.metrics == nil ? "Not running, or observability_addr isn't set" : "Running")
         if let nodes = store.nodes {
-            ForEach(nodes, id: \.name) { NodeRow(node: $0) }
+            ForEach(nodes, id: \.name) { NodeRow(node: $0, metric: store.metrics?[$0.name]) }
         } else {
             Text("Can't read \(store.path)")
         }
@@ -24,15 +25,22 @@ struct MenuContent: View {
     }
 }
 
-// A node's name and IP. Clicking it copies the IP.
+// A node's name, IP and, for a peer, its best metric. Clicking it copies the IP.
 struct NodeRow: View {
     let node: Node
+    let metric: UInt32?
 
     var body: some View {
-        Button("\(node.name)  \(node.address ?? "no address")") {
+        Button(label) {
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(node.address ?? "", forType: .string)
         }
         .disabled(node.address == nil)
+    }
+
+    private var label: String {
+        var label = "\(node.name)  \(node.address ?? "no address")"
+        if let metric { label += "  metric \(metric >= INFM ? "INF" : String(metric))" }
+        return label
     }
 }

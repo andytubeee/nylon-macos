@@ -1,6 +1,6 @@
 # Nylon Mac App
 
-A menu bar app that lists the nodes in your [nylon](https://github.com/encodeous/nylon) network with their IPs. Click a node to copy its IP.
+A menu bar app that lists the nodes in your [nylon](https://github.com/encodeous/nylon) network with their IPs, and each peer's best metric (the same number `nylon status` shows). Click a node to copy its IP.
 
 ## Run it
 
@@ -13,7 +13,15 @@ A menu bar app that lists the nodes in your [nylon](https://github.com/encodeous
 
 3. Click the network icon in the menu bar, then "Choose central.yaml…" and pick your file. The app remembers it for next time.
 
-To skip the picker, pass the file: `.build/release/NylonApp -central /path/to/central.yaml`. With no file chosen, it reads `central.yaml` in the current directory, like `nylon run`.
+4. For metrics, turn on nylon's metrics endpoint. Add this to `node.yaml` and restart nylon:
+
+   ```yaml
+   observability_addr: 127.0.0.1:9090
+   ```
+
+   Without it the menu says "Not running". The app doesn't need root.
+
+To skip the picker, pass the file: `.build/release/NylonApp -central /path/to/central.yaml`. With no file chosen, it reads `central.yaml` in the current directory, like `nylon run`. If nylon serves metrics somewhere else, pass `-metrics http://127.0.0.1:<port>/metrics`.
 
 ## Test
 

@@ -2,7 +2,7 @@ import Foundation
 import Testing
 @testable import NylonApp
 
-// In the format nylon's writePrometheusMetrics prints
+// A trimmed-down nylon /metrics response
 @Test func readsPeers() {
     let text = """
     # HELP nylon_up Whether the nylon daemon is ready.

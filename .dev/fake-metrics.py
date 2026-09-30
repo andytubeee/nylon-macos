@@ -7,9 +7,8 @@ import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 INF = 2**32 - 1
-# peer -> {endpoint: its usual ping in microseconds (nylon's metric unit)}. phone and laptop are passive clients, so
-# they have no endpoints: laptop is online (recent handshake, shows "connected"), phone never connected ("offline").
-# alice is left out as this device: nylon doesn't list itself as a peer.
+# peer -> {endpoint: usual ping in µs}. phone and laptop are passive clients (central.yaml `clients`), which nylon
+# never measures: laptop is online ("connected"), phone never connected ("offline"). alice is this device, so no peer.
 PEERS = {
     "bob": {"10.10.0.2:57175": 1800, "bob.example.com": 24000},  # same LAN, and over the internet
     "carol": {"10.10.0.3:57175": 2500},

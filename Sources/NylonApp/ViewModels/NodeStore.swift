@@ -43,14 +43,9 @@ final class NodeStore: ObservableObject {
     }
 }
 
-// What a menu row says about a peer:
-// - latency, when an endpoint connects. A metric is the endpoint's smoothed ping in microseconds
-//   (`DurationToMetric` in nylon's state/endpoint.go).
-// - "connected", when none does but the WireGuard session is live. A passive client (a phone, a laptop) has no
-//   endpoints of its own, so this is how it looks when it's online. WireGuard drops a session 180s after its
-//   handshake (REJECT_AFTER_TIME), so a newer handshake means the tunnel still works.
-// - "offline" otherwise.
+// A peer's latency once nylon has measured one, else whether its WireGuard tunnel is up.
+// nylon never measures passive clients, so for them the tunnel is the only sign they're online.
 func statusText(_ peer: Peer, now: Date = Date()) -> String {
-    if peer.metric < INFM { return String(format: "%.1fms", Double(peer.metric) / 1000) }
-    return now.timeIntervalSince1970 - peer.handshake < 180 ? "connected" : "offline"
+    if peer.metric < INFM { return String(format: "%.1fms", Double(peer.metric) / 1000) } // metric is in µs
+    return now.timeIntervalSince1970 - peer.handshake < 180 ? "connected" : "offline" // WireGuard drops a session after 180s
 }

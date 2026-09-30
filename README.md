@@ -23,6 +23,18 @@ A menu bar app that lists the nodes in your [nylon](https://github.com/encodeous
 
 To skip the picker, pass the file: `.build/release/NylonApp -central /path/to/central.yaml`. With no file chosen, it reads `central.yaml` in the current directory, like `nylon run`. If nylon serves metrics somewhere else, pass `-metrics http://127.0.0.1:<port>/metrics`.
 
+## Try it without nylon
+
+`.dev/` has a fake network and a fake nylon `/metrics` that returns new latencies on every request. From this folder, in two terminals:
+
+```bash
+python3 .dev/fake-metrics.py
+```
+
+```bash
+.dev/run.sh .dev/central.yaml -metrics http://127.0.0.1:9091/metrics
+```
+
 ## Test
 
 ```bash

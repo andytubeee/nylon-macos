@@ -23,6 +23,7 @@ import Testing
     #expect(readBestMetrics(text) == ["bob": 12034, "carol": INF, "phone": INF])
 }
 
-@Test func readsNothingFromGarbage() {
-    #expect(readBestMetrics("<html>not metrics</html>").isEmpty)
+// e.g. Prometheus itself, which also serves /metrics on 9090
+@Test func rejectsOtherServers() {
+    #expect(readBestMetrics("prometheus_build_info{version=\"3.0.0\"} 1") == nil)
 }

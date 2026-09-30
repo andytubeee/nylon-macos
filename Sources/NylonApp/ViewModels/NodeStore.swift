@@ -30,14 +30,15 @@ final class NodeStore: ObservableObject {
     private func poll() async {
         guard let url = URL(string: UserDefaults.standard.string(forKey: "metrics") ?? "http://127.0.0.1:9090/metrics") else { return }
         while true {
-            metrics = await Self.fetch(url)
+            metrics = try? await fetch(url)
             try? await Task.sleep(for: .seconds(5))
         }
     }
 
-    private static func fetch(_ url: URL) async -> [String: UInt32]? {
-        guard case let (data, response)? = try? await URLSession.shared.data(for: URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 2)),
-              (response as? HTTPURLResponse)?.statusCode == 200 else { return nil }
+    private func fetch(_ url: URL) async throws -> [String: UInt32]? {
+        let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 2) // always live numbers
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else { return nil }
         return readBestMetrics(String(decoding: data, as: UTF8.self))
     }
 }

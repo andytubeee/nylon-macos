@@ -11,7 +11,7 @@ struct MenuApp: App {
     }
 
     var body: some Scene {
-        MenuBarExtra("Nylon", systemImage: store.metrics == nil ? "network.slash" : "network") {
+        MenuBarExtra("Nylon", systemImage: store.peers == nil ? "network.slash" : "network") {
             MenuContent(store: store)
         }
     }

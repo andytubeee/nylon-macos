@@ -1,6 +1,6 @@
 # Nylon Mac App
 
-A menu bar app that lists the nodes in your [nylon](https://github.com/encodeous/nylon) network with their IPs, and each peer's best metric (the same number `nylon status` shows). Click a node to copy its IP.
+A menu bar app that lists the nodes in your [nylon](https://github.com/encodeous/nylon) network.
 
 ## Run it
 
@@ -13,7 +13,7 @@ A menu bar app that lists the nodes in your [nylon](https://github.com/encodeous
 
 3. Click the network icon in the menu bar, then "Choose central.yaml…" and pick your file. The app remembers it for next time.
 
-4. For metrics, turn on nylon's metrics endpoint. Add this to `node.yaml` and restart nylon:
+4. For latency, turn on nylon's metrics endpoint. Add this to `node.yaml` and restart nylon:
 
    ```yaml
    observability_addr: 127.0.0.1:9090
@@ -22,6 +22,18 @@ A menu bar app that lists the nodes in your [nylon](https://github.com/encodeous
    Without it the menu says "Not running". The app doesn't need root.
 
 To skip the picker, pass the file: `.build/release/NylonApp -central /path/to/central.yaml`. With no file chosen, it reads `central.yaml` in the current directory, like `nylon run`. If nylon serves metrics somewhere else, pass `-metrics http://127.0.0.1:<port>/metrics`.
+
+## Try it without nylon
+
+`.dev/` has a fake network and a fake nylon `/metrics` that returns new latencies on every request. From this folder, in two terminals:
+
+```bash
+python3 .dev/fake-metrics.py
+```
+
+```bash
+.dev/run.sh .dev/central.yaml -metrics http://127.0.0.1:9091/metrics
+```
 
 ## Test
 

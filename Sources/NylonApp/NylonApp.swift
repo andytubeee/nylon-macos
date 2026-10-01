@@ -11,8 +11,22 @@ struct MenuApp: App {
     }
 
     var body: some Scene {
-        MenuBarExtra("Nylon", systemImage: store.peers == nil ? "network.slash" : "network") {
+        MenuBarExtra {
             MenuContent(store: store)
+        } label: {
+            Image(nsImage: store.peers == nil ? stoppedIcon : runningIcon)
         }
     }
+}
+
+private let runningIcon = menuBarIcon("MenuBarRunning")
+private let stoppedIcon = menuBarIcon("MenuBarStopped")
+
+// An SVG from Resources/, sized for the menu bar
+func menuBarIcon(_ name: String) -> NSImage {
+    let image = Bundle.module.image(forResource: name)! // built into the app, so it can't be missing
+    image.size = NSSize(width: 18, height: 18)
+    image.isTemplate = true // macOS tints it to match a light or dark menu bar
+    image.accessibilityDescription = "Nylon"
+    return image
 }

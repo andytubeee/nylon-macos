@@ -4,6 +4,8 @@ import SwiftUI
 @main
 struct MenuApp: App {
     @StateObject private var store = NodeStore()
+    private static let runningIcon = menuBarIcon("MenuBarRunning")
+    private static let stoppedIcon = menuBarIcon("MenuBarStopped")
 
     init() {
         // menu bar only; without an app bundle it would otherwise start background-only
@@ -14,19 +16,16 @@ struct MenuApp: App {
         MenuBarExtra {
             MenuContent(store: store)
         } label: {
-            Image(nsImage: store.peers == nil ? stoppedIcon : runningIcon)
+            Image(nsImage: store.peers == nil ? Self.stoppedIcon : Self.runningIcon)
+                .accessibilityLabel("Nylon")
         }
     }
 }
-
-private let runningIcon = menuBarIcon("MenuBarRunning")
-private let stoppedIcon = menuBarIcon("MenuBarStopped")
 
 // An SVG from Resources/, sized for the menu bar
 func menuBarIcon(_ name: String) -> NSImage {
     let image = Bundle.module.image(forResource: name)! // built into the app, so it can't be missing
     image.size = NSSize(width: 18, height: 18)
     image.isTemplate = true // macOS tints it to match a light or dark menu bar
-    image.accessibilityDescription = "Nylon"
     return image
 }

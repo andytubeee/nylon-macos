@@ -1,4 +1,4 @@
-import Foundation
+import AppKit
 
 // What the menu shows. Views read it; where the data comes from stays in here.
 // ObservableObject, since @State is a macro the Command Line Tools can't expand (no SwiftUI macro plugin).
@@ -30,7 +30,9 @@ final class NodeStore: ObservableObject {
     private func poll() async {
         guard let url = URL(string: UserDefaults.standard.string(forKey: "metrics") ?? "http://127.0.0.1:9090/metrics") else { return }
         while true {
-            peers = try? await fetch(url)
+            let latest = try? await fetch(url)
+            // Updating rows under an open menu makes its highlight jump, so wait until it closes.
+            if RunLoop.main.currentMode != .eventTracking { peers = latest }
             try? await Task.sleep(for: .seconds(5))
         }
     }

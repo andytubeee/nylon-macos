@@ -6,7 +6,7 @@ let package = Package(
     platforms: [.macOS(.v14)],
     dependencies: [.package(url: "https://github.com/jpsim/Yams.git", from: "6.2.2")],
     targets: [
-        .executableTarget(name: "NylonApp", dependencies: ["Yams"]),
+        .executableTarget(name: "NylonApp", dependencies: ["Yams"], resources: [.process("Resources")]),
         .testTarget(name: "NylonAppTests", dependencies: ["NylonApp"]),
     ]
 )

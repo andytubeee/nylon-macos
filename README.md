@@ -7,23 +7,10 @@ A menu bar app that lists the nodes in your [nylon](https://github.com/encodeous
 For Apple Silicon Macs on macOS 14 or later.
 
 1. Open `Nylon.dmg` and drag Nylon onto Applications.
-2. Open Nylon. macOS blocks it the first time, because the app isn't notarized by Apple. Go to System Settings → Privacy & Security, find "Nylon was blocked", and click Open Anyway. Or skip the dialog:
+2. Open Nylon. Apple hasn't notarized the app, so macOS blocks it the first time. Go to System Settings → Privacy & Security, find "Nylon was blocked", and click Open Anyway. Or clear the block from a terminal:
 
    ```bash
    xattr -dr com.apple.quarantine /Applications/Nylon.app
-   ```
-
-3. Click the nylon icon in the menu bar, then "Choose central.yaml…" and pick your file.
-
-To build the DMG yourself, run `Packaging/package.sh`. It writes `dist/Nylon.dmg`.
-
-## Run it from source
-
-1. Install the Command Line Tools if you don't have them: `xcode-select --install`
-2. From this folder, build and start it:
-
-   ```bash
-   swift build -c release && .build/release/NylonApp
    ```
 
 3. Click the nylon icon in the menu bar, then "Choose central.yaml…" and pick your file. The app remembers it for next time.
@@ -35,6 +22,19 @@ To build the DMG yourself, run `Packaging/package.sh`. It writes `dist/Nylon.dmg
    ```
 
    Without it the menu says "Not running". The app doesn't need root.
+
+`Packaging/package.sh` builds the DMG and writes it to `dist/Nylon.dmg`.
+
+## Run it from source
+
+1. Install the Command Line Tools if you don't have them: `xcode-select --install`
+2. From this folder, build and start it:
+
+   ```bash
+   swift build -c release && .build/release/NylonApp
+   ```
+
+3. Follow steps 3 and 4 of Install.
 
 To skip the picker, pass the file: `.build/release/NylonApp -central /path/to/central.yaml`. With no file chosen, it reads `central.yaml` in the current directory, like `nylon run`. If nylon serves metrics somewhere else, pass `-metrics http://127.0.0.1:<port>/metrics`.
 

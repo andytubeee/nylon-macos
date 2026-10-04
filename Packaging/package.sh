@@ -6,7 +6,8 @@ cd "$(dirname "$0")/.."
 swift build -c release
 bin=$(swift build -c release --show-bin-path)
 
-app=dist/Nylon.app
+stage=dist/dmg # what the DMG shows: the app and a shortcut to Applications
+app=$stage/Nylon.app
 rm -rf dist
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 cp "$bin/NylonApp" "$app/Contents/MacOS/"
@@ -26,13 +27,10 @@ for size in 16 32 128 256 512; do
     done
 done
 iconutil -c icns "$iconset" -o "$app/Contents/Resources/AppIcon.icns"
-rm -r "$iconset"
 
 # Ad hoc signature: the app isn't notarized, so its first launch needs "Open Anyway" in System Settings.
 codesign --force --sign - "$app"
 
-mkdir dist/dmg
-mv "$app" dist/dmg/
-ln -s /Applications dist/dmg/Applications
-hdiutil create -volname Nylon -srcfolder dist/dmg -ov -format UDZO dist/Nylon.dmg
-rm -r dist/dmg
+ln -s /Applications "$stage/Applications"
+hdiutil create -volname Nylon -srcfolder "$stage" -format UDZO dist/Nylon.dmg
+rm -r "$stage" "$iconset"

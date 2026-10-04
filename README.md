@@ -2,7 +2,22 @@
 
 A menu bar app that lists the nodes in your [nylon](https://github.com/encodeous/nylon) network.
 
-## Run it
+## Install
+
+For Apple Silicon Macs on macOS 14 or later.
+
+1. Open `Nylon.dmg` and drag Nylon onto Applications.
+2. Open Nylon. macOS blocks it the first time, because the app isn't notarized by Apple. Go to System Settings → Privacy & Security, find "Nylon was blocked", and click Open Anyway. Or skip the dialog:
+
+   ```bash
+   xattr -dr com.apple.quarantine /Applications/Nylon.app
+   ```
+
+3. Click the nylon icon in the menu bar, then "Choose central.yaml…" and pick your file.
+
+To build the DMG yourself, run `Packaging/package.sh`. It writes `dist/Nylon.dmg`.
+
+## Run it from source
 
 1. Install the Command Line Tools if you don't have them: `xcode-select --install`
 2. From this folder, build and start it:
@@ -11,7 +26,7 @@ A menu bar app that lists the nodes in your [nylon](https://github.com/encodeous
    swift build -c release && .build/release/NylonApp
    ```
 
-3. Click the network icon in the menu bar, then "Choose central.yaml…" and pick your file. The app remembers it for next time.
+3. Click the nylon icon in the menu bar, then "Choose central.yaml…" and pick your file. The app remembers it for next time.
 
 4. For latency, turn on nylon's metrics endpoint. Add this to `node.yaml` and restart nylon:
 

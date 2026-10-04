@@ -10,7 +10,7 @@ stage=dist/dmg # what the DMG shows: the app and a shortcut to Applications
 app=$stage/Nylon.app
 rm -rf dist
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
-cp "$bin/NylonApp" "$app/Contents/MacOS/"
+cp "$bin/Nylon" "$app/Contents/MacOS/"
 cp -R "$bin/Nylon_NylonApp.bundle" "$app/Contents/Resources/" # the menu bar icons
 cp Packaging/Info.plist "$app/Contents/"
 

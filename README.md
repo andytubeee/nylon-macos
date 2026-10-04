@@ -31,12 +31,12 @@ For Apple Silicon Macs on macOS 14 or later.
 2. From this folder, build and start it:
 
    ```bash
-   swift build -c release && .build/release/NylonApp
+   swift build -c release && .build/release/Nylon
    ```
 
 3. Follow steps 3 and 4 of Install.
 
-To skip Settings, pass the file: `.build/release/NylonApp -central /path/to/central.yaml`. With no file chosen, it reads `central.yaml` in the current directory, like `nylon run`. If nylon serves metrics somewhere else, pass `-metrics http://127.0.0.1:<port>/metrics`.
+To skip Settings, pass the file: `.build/release/Nylon -central /path/to/central.yaml`. With no file chosen, it reads `central.yaml` in the current directory, like `nylon run`. If nylon serves metrics somewhere else, pass `-metrics http://127.0.0.1:<port>/metrics`.
 
 ## Try it without nylon
 

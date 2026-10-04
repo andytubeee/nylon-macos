@@ -8,7 +8,10 @@ final class NodeStore: ObservableObject {
     @Published private(set) var nodes: [Node]? // nil when central.yaml can't be read
     @Published private(set) var peers: [String: Peer]? // by node id; nil while nylon's /metrics doesn't answer
     // where nylon serves /metrics: node.yaml's observability_addr
-    @Published var metricsURL: String { didSet { UserDefaults.standard.set(metricsURL, forKey: "metrics") } }
+    @Published var metricsURL: String {
+        // save an edit, but not the text field handing back the same value: that would make a one-off `-metrics` stick
+        didSet { if metricsURL != oldValue { UserDefaults.standard.set(metricsURL, forKey: "metrics") } }
+    }
 
     // Each setting is the one saved in Settings or passed as `-central <path>` / `-metrics <url>` (both land in
     // UserDefaults), else nylon's default: ./central.yaml like `nylon run`, and port 9090.

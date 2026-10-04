@@ -14,7 +14,7 @@ cp "$bin/Nylon" "$app/Contents/MacOS/"
 cp -R "$bin/Nylon_NylonApp.bundle" "$app/Contents/Resources/" # the menu bar icons
 cp Packaging/Info.plist "$app/Contents/"
 
-# AppIcon.icns from AppIcon.svg (a copy of nylon's docs/assets/logo_neutral.svg): each size macOS asks for,
+# AppIcon.icns from the app's Logo.svg (a copy of nylon's docs/assets/logo_neutral.svg): each size macOS asks for,
 # drawn at 80% so it has the margin other app icons have
 iconset=dist/AppIcon.iconset
 mkdir "$iconset"
@@ -22,7 +22,7 @@ for size in 16 32 128 256 512; do
     for scale in 1 2; do
         px=$((size * scale))
         png=$iconset/icon_${size}x${size}$([ $scale = 2 ] && echo @2x || true).png
-        sips -s format png -z $((px * 8 / 10)) $((px * 8 / 10)) Packaging/AppIcon.svg --out "$png" >/dev/null
+        sips -s format png -z $((px * 8 / 10)) $((px * 8 / 10)) Sources/NylonApp/Resources/Logo.svg --out "$png" >/dev/null
         sips -p $px $px "$png" >/dev/null
     done
 done

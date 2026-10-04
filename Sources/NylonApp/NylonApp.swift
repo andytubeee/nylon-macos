@@ -16,8 +16,10 @@ struct MenuApp: App {
         MenuBarExtra {
             MenuContent(store: store)
         } label: {
-            Image(nsImage: store.peers == nil ? Self.stoppedIcon : Self.runningIcon)
-                .accessibilityLabel("Nylon")
+            MenuBarIcon(image: store.peers == nil ? Self.stoppedIcon : Self.runningIcon, needsSetup: store.nodes == nil)
+        }
+        Settings {
+            SettingsView(store: store)
         }
     }
 }

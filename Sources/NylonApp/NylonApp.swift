@@ -13,9 +13,7 @@ struct MenuApp: App {
         // showSettings makes it a regular app while a window is open; go back once the last one closes
         NotificationCenter.default.addObserver(forName: NSWindow.willCloseNotification, object: nil, queue: .main) { _ in
             DispatchQueue.main.async { // by now the window is gone
-                if !NSApp.windows.contains(where: { $0.isVisible && $0.canBecomeMain }) {
-                    NSApp.setActivationPolicy(.accessory)
-                }
+                if openWindows().isEmpty { NSApp.setActivationPolicy(.accessory) }
             }
         }
     }
@@ -29,7 +27,18 @@ struct MenuApp: App {
         Settings {
             SettingsView(store: store)
         }
+        .commands {
+            // Cmd-Q with a window open closes the window; the menu bar app keeps running (its menu has Quit)
+            CommandGroup(replacing: .appTermination) {
+                Button("Close Window") { openWindows().forEach { $0.performClose(nil) } }.keyboardShortcut("q")
+            }
+        }
     }
+}
+
+// The app's real windows (Settings), not its menu bar item
+@MainActor func openWindows() -> [NSWindow] {
+    NSApp.windows.filter { $0.isVisible && $0.canBecomeMain }
 }
 
 // An SVG from Resources/, sized for the menu bar

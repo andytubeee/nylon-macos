@@ -10,6 +10,14 @@ struct MenuApp: App {
     init() {
         // menu bar only; without an app bundle it would otherwise start background-only
         NSApplication.shared.setActivationPolicy(.accessory)
+        // showSettings makes it a regular app while a window is open; go back once the last one closes
+        NotificationCenter.default.addObserver(forName: NSWindow.willCloseNotification, object: nil, queue: .main) { _ in
+            DispatchQueue.main.async { // by now the window is gone
+                if !NSApp.windows.contains(where: { $0.isVisible && $0.canBecomeMain }) {
+                    NSApp.setActivationPolicy(.accessory)
+                }
+            }
+        }
     }
 
     var body: some Scene {

@@ -24,7 +24,6 @@ struct SettingsView: View {
         .formStyle(.grouped)
         .frame(width: 480)
         .fixedSize(horizontal: false, vertical: true) // as tall as its rows, no taller
-        .onDisappear { NSApp.setActivationPolicy(.accessory) } // window closed: back to menu bar only
     }
 
     private func chooseCentral() {
@@ -49,7 +48,7 @@ struct MenuBarIcon: View {
 }
 
 // A menu bar app has no Dock icon and isn't in Cmd-Tab, so its window gets lost behind others.
-// While Settings is open the app becomes a regular one; closing the window turns it back.
+// While a window is open the app is a regular one; MenuApp turns it back when the last window closes.
 @MainActor func showSettings(_ openSettings: OpenSettingsAction) {
     NSApp.setActivationPolicy(.regular)
     NSApp.activate()

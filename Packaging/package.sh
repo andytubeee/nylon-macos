@@ -4,7 +4,7 @@ set -eu
 cd "$(dirname "$0")/.."
 
 swift build -c release
-bin=$(swift build -c release --show-bin-path)
+bin=.build/release
 
 stage=dist/dmg # what the DMG shows: the app and a shortcut to Applications
 app=$stage/Nylon.app

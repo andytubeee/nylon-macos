@@ -28,9 +28,7 @@ struct SettingsView: View {
 
     private func chooseCentral() {
         let panel = NSOpenPanel()
-        if panel.runModal() == .OK, let url = panel.url {
-            store.choose(url.path)
-        }
+        if panel.runModal() == .OK, let url = panel.url { store.choose(url.path) }
     }
 }
 

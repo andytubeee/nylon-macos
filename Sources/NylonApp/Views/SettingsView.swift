@@ -7,16 +7,24 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-            LabeledContent("central.yaml") {
-                Text(store.nodes == nil ? "Can't read \(store.path)" : store.path)
-                Button("Choose…") { chooseCentral() }
+            Section {
+                LabeledContent("central.yaml") {
+                    Text(store.nodes == nil ? "Can't read \(store.path)" : store.path)
+                        .lineLimit(1)
+                        .truncationMode(.middle) // a long path keeps its start and its file name
+                    Button("Choose…") { chooseCentral() }
+                }
             }
-            TextField("Metrics URL", text: $store.metricsURL)
-            Text(store.peers == nil ? "nylon isn't answering there. Set observability_addr in node.yaml." : "nylon is answering.")
-                .foregroundStyle(.secondary)
+            Section {
+                TextField("Metrics URL", text: $store.metricsURL)
+            } footer: {
+                Text(store.peers == nil ? "nylon isn't answering there. Set observability_addr in node.yaml." : "nylon is answering.")
+            }
         }
         .formStyle(.grouped)
         .frame(width: 480)
+        .fixedSize(horizontal: false, vertical: true) // as tall as its rows, no taller
+        .onDisappear { NSApp.setActivationPolicy(.accessory) } // window closed: back to menu bar only
     }
 
     private func chooseCentral() {
@@ -36,10 +44,14 @@ struct MenuBarIcon: View {
     var body: some View {
         Image(nsImage: image)
             .accessibilityLabel("Nylon")
-            .task {
-                guard needsSetup else { return }
-                NSApp.activate() // a menu bar app runs in the background, so bring the window to the front
-                openSettings()
-            }
+            .task { if needsSetup { showSettings(openSettings) } }
     }
+}
+
+// A menu bar app has no Dock icon and isn't in Cmd-Tab, so its window gets lost behind others.
+// While Settings is open the app becomes a regular one; closing the window turns it back.
+@MainActor func showSettings(_ openSettings: OpenSettingsAction) {
+    NSApp.setActivationPolicy(.regular)
+    NSApp.activate()
+    openSettings()
 }

@@ -13,10 +13,7 @@ struct MenuContent: View {
             Text("Can't read \(store.path)")
         }
         Divider()
-        Button("Settings…") {
-            NSApp.activate() // a menu bar app runs in the background, so bring the window to the front
-            openSettings()
-        }
+        Button("Settings…") { showSettings(openSettings) }
         Button("Quit") { NSApplication.shared.terminate(nil) }
     }
 }

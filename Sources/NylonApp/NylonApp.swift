@@ -2,14 +2,22 @@ import AppKit
 import SwiftUI
 
 @main
+enum Entry {
+    @MainActor static func main() {
+        // a socket that hangs up mid-write must give EPIPE, not kill the app or the helper (SO_NOSIGPIPE didn't always hold)
+        signal(SIGPIPE, SIG_IGN)
+        // launchd starts the root helper outside any login session: branch off before SwiftUI sets up an app
+        if CommandLine.arguments.dropFirst().first == helperFlag { runHelper() }
+        MenuApp.main()
+    }
+}
+
 struct MenuApp: App {
     @StateObject private var store = NodeStore()
     private static let runningIcon = menuBarIcon("MenuBarRunning")
     private static let stoppedIcon = menuBarIcon("MenuBarStopped")
 
     init() {
-        // a socket that hangs up mid-write must give EPIPE, not kill the app (SO_NOSIGPIPE didn't always hold)
-        signal(SIGPIPE, SIG_IGN)
         // menu bar only; without an app bundle it would otherwise start background-only
         NSApplication.shared.setActivationPolicy(.accessory)
         // showSettings makes it a regular app while a window is open; go back once the last one closes
@@ -24,7 +32,12 @@ struct MenuApp: App {
         MenuBarExtra {
             MenuContent(store: store)
         } label: {
-            MenuBarIcon(image: store.peers == nil ? Self.stoppedIcon : Self.runningIcon, needsSetup: store.nodes == nil)
+            MenuBarIcon(
+                image: store.peers == nil ? Self.stoppedIcon : Self.runningIcon,
+                needsSetup: store.nodes == nil,
+                needsAdmin: store.needsAdmin,
+                askForAdmin: store.allowAccess
+            )
         }
         Settings {
             SettingsView(store: store)

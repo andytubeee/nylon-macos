@@ -15,15 +15,9 @@ For Apple Silicon Macs on macOS 14 or later.
 
 3. Nylon opens its Settings window the first time. Click "Choose…" and pick your `central.yaml`. The app remembers it. To change it later, click the nylon icon in the menu bar, then "Settings…".
 
-4. nylon's status socket, the one `nylon status` uses, is root only. Until Nylon can install a helper for this, give your user access to it (redo this after nylon restarts, since the socket's name changes):
+4. nylon's status socket, the one `nylon status` uses, is root only. While nylon is running, Nylon opens System Settings → General → Login Items so you can allow its helper once. The helper runs as root, passes on nylon's status and nothing else, and only answers Nylon itself. If you skip it, the menu offers "Allow Access…".
 
-   ```bash
-   sudo chmod +a "$(whoami) allow write" /var/run/wireguard/utun*.sock
-   ```
-
-   Without it the menu says Nylon needs access to nylon's status.
-
-`Packaging/package.sh` builds the DMG and writes it to `dist/Nylon.dmg`.
+`Packaging/package.sh` builds the DMG and writes it to `dist/Nylon.dmg`. Set `SIGN_ID` to sign with a certificate from your keychain, otherwise it's signed ad hoc.
 
 ## Run it from source
 
@@ -34,7 +28,11 @@ For Apple Silicon Macs on macOS 14 or later.
    swift build -c release && .build/release/Nylon
    ```
 
-3. Follow steps 3 and 4 of Install.
+3. Follow step 3 of Install. A build run from `.build/` isn't an app bundle, so it can't install the helper. To read a real nylon from it, give your user access to nylon's socket (redo this after nylon restarts, since the socket's name changes):
+
+   ```bash
+   sudo chmod +a "$(whoami) allow write" /var/run/wireguard/utun*.sock
+   ```
 
 To skip Settings, pass the file: `.build/release/Nylon -central /path/to/central.yaml`. With no file chosen, it reads `central.yaml` in the current directory, like `nylon run`.
 

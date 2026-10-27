@@ -27,18 +27,28 @@ struct SettingsView: View {
     }
 }
 
-// The menu bar icon. On a launch with no readable central.yaml it opens Settings, so a new user isn't left guessing.
+// The menu bar icon. On a launch with no readable central.yaml it opens Settings, so a new user isn't left guessing,
+// and when nylon's socket turns out to need root it asks for admin access.
 struct MenuBarIcon: View {
     let image: NSImage
     let needsSetup: Bool
+    let needsAdmin: Bool
+    let askForAdmin: () -> Void
     @Environment(\.openSettings) private var openSettings
 
     var body: some View {
         Image(nsImage: image)
             .accessibilityLabel("Nylon")
             .task { if needsSetup { showSettings(openSettings) } }
+            .task(id: needsAdmin) {
+                guard needsAdmin, !askedForAdmin else { return } // ask once a run; after that the menu offers it
+                askedForAdmin = true
+                askForAdmin()
+            }
     }
 }
+
+@MainActor private var askedForAdmin = false
 
 // A menu bar app has no Dock icon and isn't in Cmd-Tab, so its window gets lost behind others.
 // While a window is open the app is a regular one; MenuApp turns it back when the last window closes.

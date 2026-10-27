@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.encodeous.nylon-macos.helper</string>
+	<!-- the app's own binary in helper mode; BundleProgram is relative to the app bundle -->
+	<key>BundleProgram</key>
+	<string>Contents/MacOS/Nylon</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>Nylon</string>
+		<string>--xpc-helper</string>
+	</array>
+	<key>MachServices</key>
+	<dict>
+		<key>com.encodeous.nylon-macos.helper</key>
+		<true/>
+	</dict>
+</dict>
+</plist>

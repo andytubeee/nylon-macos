@@ -1,4 +1,5 @@
 import AppKit
+import ServiceManagement
 
 // What the menu shows. Views read it; where the data comes from stays in here.
 // ObservableObject, since @State is a macro the Command Line Tools can't expand (no SwiftUI macro plugin).
@@ -7,7 +8,7 @@ final class NodeStore: ObservableObject {
     @Published private(set) var path = ""
     @Published private(set) var nodes: [Node]? // nil when central.yaml can't be read
     @Published private(set) var peers: [String: Peer]? // by node id; nil while nylon doesn't answer
-    @Published private(set) var needsAdmin = false // nylon's socket is root only and this user has no access to it
+    @Published private(set) var needsAdmin = false // nylon's socket is root only and the helper isn't approved or reachable
     // where nylon keeps its IPC socket; `-socket-dir <path>` points at a fake one for development
     private let nylonDir = UserDefaults.standard.string(forKey: "socket-dir") ?? "/var/run/wireguard"
 
@@ -29,6 +30,12 @@ final class NodeStore: ObservableObject {
         nodes = try? readNodes(String(contentsOfFile: self.path, encoding: .utf8))
     }
 
+    // Registers the root helper (see Helper.swift). macOS asks the user once to approve it in Login Items.
+    func allowAccess() {
+        try? helperDaemon.register()
+        if helperDaemon.status == .requiresApproval { SMAppService.openSystemSettingsLoginItems() }
+    }
+
     private func poll() async {
         while true {
             await refresh()
@@ -41,12 +48,23 @@ final class NodeStore: ObservableObject {
         // Updating rows under an open menu makes its highlight jump, so wait until it closes.
         guard RunLoop.main.currentMode != .eventTracking else { return }
         peers = try? result.get()
-        if case .failure = result { needsAdmin = true } else { needsAdmin = false } // the only error fetchPeers throws
+        if case .failure = result { needsAdmin = true } else { needsAdmin = false } // refused, and no working helper
     }
 
+    // nylon's socket directly (works in dev, or with an ACL for this user), else through the helper once it's approved
     private func fetch() async -> Result<[String: Peer]?, Error> {
         let dir = nylonDir
-        return await Task.detached { Result { try fetchPeers(in: dir) } }.value // socket I/O blocks
+        let helperEnabled = helperDaemon.status == .enabled
+        return await Task.detached { // socket and XPC calls block
+            let direct = Result { try fetchPeers(in: dir) }
+            guard case .failure = direct, helperEnabled else { return direct }
+            // a fresh connection each time: one made before the helper was approved stays invalid
+            let connection = NSXPCConnection(machServiceName: helperService, options: .privileged)
+            connection.remoteObjectInterface = NSXPCInterface(with: NylonHelper.self)
+            connection.resume()
+            defer { connection.invalidate() }
+            return Result { try helperStatus(connection).flatMap(readPeers) }
+        }.value
     }
 }
 

@@ -13,6 +13,8 @@ mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 cp "$bin/Nylon" "$app/Contents/MacOS/"
 cp -R "$bin/Nylon_NylonApp.bundle" "$app/Contents/Resources/" # the menu bar icons
 cp Packaging/Info.plist "$app/Contents/"
+mkdir -p "$app/Contents/Library/LaunchDaemons" # where SMAppService looks for the helper's launchd plist
+cp Packaging/com.encodeous.nylon-macos.helper.plist "$app/Contents/Library/LaunchDaemons/"
 
 # AppIcon.icns from AppIcon.svg (a copy of nylon's docs/assets/logo_neutral.svg): each size macOS asks for,
 # drawn at 80% so it has the margin other app icons have
@@ -28,8 +30,9 @@ for size in 16 32 128 256 512; do
 done
 iconutil -c icns "$iconset" -o "$app/Contents/Resources/AppIcon.icns"
 
-# Ad hoc signature: the app isn't notarized, so its first launch needs "Open Anyway" in System Settings.
-codesign --force --sign - "$app"
+# Signed with SIGN_ID (a Developer ID or another certificate in the keychain) if set, else ad hoc.
+# Not notarized, so the first launch needs "Open Anyway" in System Settings.
+codesign --force --options runtime --sign "${SIGN_ID:--}" "$app"
 
 ln -s /Applications "$stage/Applications"
 hdiutil create -volname Nylon -srcfolder "$stage" -format UDZO dist/Nylon.dmg

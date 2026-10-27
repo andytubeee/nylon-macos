@@ -7,6 +7,9 @@ struct MenuContent: View {
 
     var body: some View {
         Text(store.peers != nil ? "Running" : store.needsAdmin ? "Needs admin access to read nylon's status" : "Not running")
+        if store.needsAdmin {
+            Button("Allow Access…") { store.allowAccess() }
+        }
         if let nodes = store.nodes {
             ForEach(nodes, id: \.name) { NodeRow(node: $0, peer: store.peers?[$0.name]) }
         } else {

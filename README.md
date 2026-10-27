@@ -15,13 +15,13 @@ For Apple Silicon Macs on macOS 14 or later.
 
 3. Nylon opens its Settings window the first time. Click "Choose…" and pick your `central.yaml`. The app remembers it. To change it later, click the nylon icon in the menu bar, then "Settings…".
 
-4. For latency, turn on nylon's metrics endpoint. Add this to `node.yaml` and restart nylon:
+4. nylon's status socket, the one `nylon status` uses, is root only. Until Nylon can install a helper for this, give your user access to it (redo this after nylon restarts, since the socket's name changes):
 
-   ```yaml
-   observability_addr: 127.0.0.1:9090
+   ```bash
+   sudo chmod +a "$(whoami) allow write" /var/run/wireguard/utun*.sock
    ```
 
-   Without it the menu says "Not running". If nylon listens somewhere else, change "Metrics URL" in Settings. The app doesn't need root.
+   Without it the menu says Nylon needs access to nylon's status.
 
 `Packaging/package.sh` builds the DMG and writes it to `dist/Nylon.dmg`.
 
@@ -36,18 +36,18 @@ For Apple Silicon Macs on macOS 14 or later.
 
 3. Follow steps 3 and 4 of Install.
 
-To skip Settings, pass the file: `.build/release/Nylon -central /path/to/central.yaml`. With no file chosen, it reads `central.yaml` in the current directory, like `nylon run`. If nylon serves metrics somewhere else, pass `-metrics http://127.0.0.1:<port>/metrics`.
+To skip Settings, pass the file: `.build/release/Nylon -central /path/to/central.yaml`. With no file chosen, it reads `central.yaml` in the current directory, like `nylon run`.
 
 ## Try it without nylon
 
-`.dev/` has a fake network and a fake nylon `/metrics` that returns new latencies on every request. From this folder, in two terminals:
+`.dev/` has a fake network and a fake nylon socket that returns new latencies on every request. You own that socket, so there's no admin prompt. From this folder, in two terminals:
 
 ```bash
-python3 .dev/fake-metrics.py
+python3 .dev/fake-nylon.py
 ```
 
 ```bash
-.dev/run.sh .dev/central.yaml -metrics http://127.0.0.1:9091/metrics
+.dev/run.sh .dev/central.yaml -socket-dir /tmp/fake-nylon
 ```
 
 ## Test

@@ -1,7 +1,7 @@
 #!/bin/sh
 # Builds the nylon macOS menu app (nylon-macos repo) and starts it.
 # No argument: it uses the file picked in its menu (or ./central.yaml). With one: that file.
-# Anything after it goes to the app, e.g. -metrics http://127.0.0.1:9091/metrics
+# Anything after it goes to the app, e.g. -socket-dir /tmp/fake-nylon
 set -eu
 
 app=$(cd "$(dirname "$0")/.." && pwd)

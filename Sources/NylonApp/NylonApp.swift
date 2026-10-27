@@ -8,6 +8,8 @@ struct MenuApp: App {
     private static let stoppedIcon = menuBarIcon("MenuBarStopped")
 
     init() {
+        // a socket that hangs up mid-write must give EPIPE, not kill the app (SO_NOSIGPIPE didn't always hold)
+        signal(SIGPIPE, SIG_IGN)
         // menu bar only; without an app bundle it would otherwise start background-only
         NSApplication.shared.setActivationPolicy(.accessory)
         // showSettings makes it a regular app while a window is open; go back once the last one closes

@@ -6,17 +6,13 @@ import AppKit
 final class NodeStore: ObservableObject {
     @Published private(set) var path = ""
     @Published private(set) var nodes: [Node]? // nil when central.yaml can't be read
-    @Published private(set) var peers: [String: Peer]? // by node id; nil while nylon's /metrics doesn't answer
-    // where nylon serves /metrics: node.yaml's observability_addr
-    @Published var metricsURL: String {
-        // save an edit, but not the text field handing back the same value: that would make a one-off `-metrics` stick
-        didSet { if metricsURL != oldValue { UserDefaults.standard.set(metricsURL, forKey: "metrics") } }
-    }
+    @Published private(set) var peers: [String: Peer]? // by node id; nil while nylon doesn't answer
+    @Published private(set) var needsAdmin = false // nylon's socket is root only and this user has no access to it
+    // where nylon keeps its IPC socket; `-socket-dir <path>` points at a fake one for development
+    private let nylonDir = UserDefaults.standard.string(forKey: "socket-dir") ?? "/var/run/wireguard"
 
-    // Each setting is the one saved in Settings or passed as `-central <path>` / `-metrics <url>` (both land in
-    // UserDefaults), else nylon's default: ./central.yaml like `nylon run`, and port 9090.
+    // The file picked in Settings or passed as `-central <path>` (both land in UserDefaults), else ./central.yaml like `nylon run`
     init() {
-        metricsURL = UserDefaults.standard.string(forKey: "metrics") ?? "http://127.0.0.1:9090/metrics"
         load(UserDefaults.standard.string(forKey: "central") ?? "central.yaml")
         Task { await poll() }
     }
@@ -35,19 +31,22 @@ final class NodeStore: ObservableObject {
 
     private func poll() async {
         while true {
-            let latest = try? await fetch()
-            // Updating rows under an open menu makes its highlight jump, so wait until it closes.
-            if RunLoop.main.currentMode != .eventTracking { peers = latest }
+            await refresh()
             try? await Task.sleep(for: .seconds(5))
         }
     }
 
-    private func fetch() async throws -> [String: Peer]? {
-        guard let url = URL(string: metricsURL) else { return nil }
-        let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 2) // always live numbers
-        let (data, response) = try await URLSession.shared.data(for: request)
-        guard (response as? HTTPURLResponse)?.statusCode == 200 else { return nil }
-        return readPeers(String(decoding: data, as: UTF8.self))
+    private func refresh() async {
+        let result = await fetch()
+        // Updating rows under an open menu makes its highlight jump, so wait until it closes.
+        guard RunLoop.main.currentMode != .eventTracking else { return }
+        peers = try? result.get()
+        if case .failure = result { needsAdmin = true } else { needsAdmin = false } // the only error fetchPeers throws
+    }
+
+    private func fetch() async -> Result<[String: Peer]?, Error> {
+        let dir = nylonDir
+        return await Task.detached { Result { try fetchPeers(in: dir) } }.value // socket I/O blocks
     }
 }
 

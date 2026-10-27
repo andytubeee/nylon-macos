@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-// The Settings window: where the app finds central.yaml and nylon's metrics.
+// The Settings window: where the app finds central.yaml.
 struct SettingsView: View {
     @ObservedObject var store: NodeStore
 
@@ -14,11 +14,6 @@ struct SettingsView: View {
                         .truncationMode(.middle) // a long path keeps its start and its file name
                     Button("Choose…") { chooseCentral() }
                 }
-            }
-            Section {
-                TextField("Metrics URL", text: $store.metricsURL)
-            } footer: {
-                Text(store.peers == nil ? "nylon isn't answering there. Set observability_addr in node.yaml." : "nylon is answering.")
             }
         }
         .formStyle(.grouped)

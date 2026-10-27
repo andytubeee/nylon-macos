@@ -6,7 +6,7 @@ struct MenuContent: View {
     @Environment(\.openSettings) private var openSettings
 
     var body: some View {
-        Text(store.peers == nil ? "Not running, or observability_addr isn't set" : "Running")
+        Text(store.peers != nil ? "Running" : store.needsAdmin ? "Needs admin access to read nylon's status" : "Not running")
         if let nodes = store.nodes {
             ForEach(nodes, id: \.name) { NodeRow(node: $0, peer: store.peers?[$0.name]) }
         } else {
